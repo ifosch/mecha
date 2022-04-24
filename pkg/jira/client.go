@@ -53,6 +53,27 @@ func (c *Client) GetProjects()  (pl *ProjectList, err error) {
 	return
 }
 
+// FindProject returns a project with a name matching `projectName`
+// argument, or an error.
+func (c *Client) FindProject(projectName string) (*Project, error) {
+	if projectName == "" {
+		return nil, fmt.Errorf("you must specify a project name")
+	}
+
+	pl, err := c.GetProjects()
+	if err != nil {
+		return nil, err
+	}
+
+	for _, p := range *pl {
+		if p.Name == projectName {
+			p.c = c
+			return &p, nil
+		}
+	}
+	return nil, fmt.Errorf("project %v not found", projectName)
+}
+
 func (c *Client) get(method, url string, response interface{}) error {
 	req, err := http.NewRequest(
 		method,
@@ -83,9 +104,8 @@ func (c *Client) get(method, url string, response interface{}) error {
 		if err == nil {
 			if errRes.Message == "" {
 				return fmt.Errorf(
-					"unknown error, status code: %d\n %v",
+					"unknown error, status code: %d",
 					res.StatusCode,
-					res,
 				)
 			}
 

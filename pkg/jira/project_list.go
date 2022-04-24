@@ -4,9 +4,7 @@ import (
 	"fmt"
 )
 
-type ProjectList []struct{
-	Name string `json:"name"`
-}
+type ProjectList []Project
 
 func (pl ProjectList) String() string {
 	output := ""
