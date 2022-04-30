@@ -14,7 +14,7 @@ type Project struct{
 // GetSprints returns all the sprints found for the Project, or an error.
 func (p *Project) GetSprints() (*SprintList, error) {
 	var boards BoardList
-	err := p.c.get("GET", fmt.Sprintf("/rest/agile/1.0/board?projectKeyOrId=%v", p.ID), &boards)
+	err := p.c.getInterface("GET", fmt.Sprintf("/rest/agile/1.0/board?projectKeyOrId=%v", p.ID), &boards)
 	if err != nil {
 		return nil, err
 	}
@@ -24,12 +24,13 @@ func (p *Project) GetSprints() (*SprintList, error) {
 		Values: []Sprint{},
 	}
 	for _, b := range boards.Values {
-		err = p.c.get("GET", fmt.Sprintf("/rest/agile/1.0/board/%v/sprint?state=active,future", b.ID), &sprints)
+		err = p.c.getInterface("GET", fmt.Sprintf("/rest/agile/1.0/board/%v/sprint?state=active,future", b.ID), &sprints)
 		if err != nil && err.Error() != "unknown error, status code: 400" {
 			return nil, err
 		}
 		for _, s := range sprints.Values {
 			if s.BoardID == b.ID {
+				s.c = p.c
 				finalSprints.Values = append(finalSprints.Values, s)
 			}
 		}

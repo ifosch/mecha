@@ -7,6 +7,8 @@ import (
 	"encoding/json"
 	"net/http"
 	"time"
+
+	"github.com/Jeffail/gabs/v2"
 )
 
 // Client represents a basic client object to access the
@@ -45,7 +47,7 @@ func NewClient(baseURL, userName, apiKey string, ctx context.Context) *Client {
 // an error.
 func (c *Client) GetProjects()  (pl *ProjectList, err error) {
 	pl = &ProjectList{}
-	err = c.get("GET", "/rest/api/2/project", pl)
+	err = c.getInterface("GET", "/rest/api/2/project", pl)
 	if err != nil {
 		return nil, err
 	}
@@ -74,14 +76,14 @@ func (c *Client) FindProject(projectName string) (*Project, error) {
 	return nil, fmt.Errorf("project %v not found", projectName)
 }
 
-func (c *Client) get(method, url string, response interface{}) error {
+func (c *Client) get(method, url string) (*http.Response, error) {
 	req, err := http.NewRequest(
 		method,
 		fmt.Sprintf("%s%s", c.baseURL, url),
 		nil,
 	)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	req.SetBasicAuth(c.userName,c.apiKey)
@@ -92,10 +94,8 @@ func (c *Client) get(method, url string, response interface{}) error {
 
 	res, err := c.HTTPClient.Do(req)
 	if err != nil {
-		return err
+		return nil, err
 	}
-
-	defer res.Body.Close()
 
 	if res.StatusCode < http.StatusOK ||
 	   res.StatusCode >= http.StatusBadRequest {
@@ -103,15 +103,25 @@ func (c *Client) get(method, url string, response interface{}) error {
 		err = json.NewDecoder(res.Body).Decode(&errRes)
 		if err == nil {
 			if errRes.Message == "" {
-				return fmt.Errorf(
+				return nil, fmt.Errorf(
 					"unknown error, status code: %d",
 					res.StatusCode,
 				)
 			}
 
-			return errors.New(errRes.Message)
+			return nil, errors.New(errRes.Message)
 		}
 	}
+
+	return res, nil
+}
+
+func (c *Client) getInterface(method, url string, response interface{}) error {
+	res, err := c.get(method, url)
+	if err != nil {
+		return err
+	}
+	defer res.Body.Close()
 
 	err = json.NewDecoder(res.Body).Decode(response)
 	if err != nil {
@@ -119,4 +129,19 @@ func (c *Client) get(method, url string, response interface{}) error {
 	}
 
 	return nil
+}
+
+func (c *Client) getContainer(method, url string) (*gabs.Container, error) {
+	res, err := c.get(method, url)
+	if err != nil {
+		return nil, err
+	}
+	defer res.Body.Close()
+
+	container, err := gabs.ParseJSONBuffer(res.Body)
+	if err != nil {
+		return nil, err
+	}
+
+	return container, nil
 }
