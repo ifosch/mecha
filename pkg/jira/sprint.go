@@ -1,6 +1,7 @@
 package jira
 
 import (
+	"encoding/json"
 	"fmt"
 	"os"
 	"strconv"
@@ -17,7 +18,54 @@ type Sprint struct {
 	EndDate time.Time `json:"endDate"`
 	CompleteDate time.Time `json:"completeDate"`
 	BoardID int `json:"originBoardId"`
+	p *Project
 	c *Client
+}
+
+// MoveIssuesToNextSprint moves all issues defined in `issues`
+// argument to next future sprint, or returns an error.
+func (s *Sprint) MoveIssuesToNextSprint(issues *IssueList) error {
+	future, err := s.p.GetNextSprint()
+	if err != nil {
+		return err
+	}
+
+	moveIssuesInputData := &moveIssuesInput{
+		Issues: []string{},
+	}
+	for _, i := range issues.Issues {
+		moveIssuesInputData.Issues = append(moveIssuesInputData.Issues, i.Key)
+	}
+	moveIssuesInputJSON, err := json.Marshal(moveIssuesInputData)
+	if err != nil {
+		return err
+	}
+
+	_, err = s.c.post(
+		fmt.Sprintf("/rest/agile/1.0/sprint/%v/issue", future.ID),
+		moveIssuesInputJSON,
+	)
+	return err
+}
+
+type moveIssuesInput struct{
+	Issues []string `json:"issues"`
+}
+
+// GetIssuesByStatus returns an `*IssueList` with the issues matching
+// the specified status (can be a comma separated list), or an error.
+func (s *Sprint) GetIssuesByStatus(statuses string) (*IssueList, error) {
+	il, err := s.GetIssues()
+	if err != nil {
+		return nil, err
+	}
+
+	filtered, err := il.FilterStatus(statuses)
+	if err != nil {
+		return nil, err
+	}
+
+	return filtered, err
 }
 
 // GetStats returns stats for this specific Sprint, or an error.

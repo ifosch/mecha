@@ -36,10 +36,29 @@ func (p *Project) GetSprints(state string) (*SprintList, error) {
 		for _, s := range sprints.Values {
 			if s.BoardID == b.ID {
 				s.c = p.c
+				s.p = p
 				finalSprints.Values = append(finalSprints.Values, s)
 			}
 		}
 	}
 
 	return &finalSprints, nil
+}
+
+// GetCurrentSprint return current active Sprint, or an error.
+func (p *Project) GetCurrentSprint() (*Sprint, error) {
+	activeSprints, err := p.GetSprints("active")
+	if err != nil {
+		return nil, err
+	}
+	return &activeSprints.Values[0], nil
+}
+
+// GetNextSprint returns next Sprint, or an error.
+func (p *Project) GetNextSprint() (*Sprint, error) {
+	futureSprints, err := p.GetSprints("future")
+	if err != nil {
+		return nil, err
+	}
+	return &futureSprints.Values[0], nil
 }
