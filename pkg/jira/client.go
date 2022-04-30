@@ -47,7 +47,7 @@ func NewClient(baseURL, userName, apiKey string, ctx context.Context) *Client {
 // an error.
 func (c *Client) GetProjects()  (pl *ProjectList, err error) {
 	pl = &ProjectList{}
-	err = c.getInterface("GET", "/rest/api/2/project", pl)
+	err = c.getInterface("/rest/api/2/project", pl)
 	if err != nil {
 		return nil, err
 	}
@@ -76,9 +76,9 @@ func (c *Client) FindProject(projectName string) (*Project, error) {
 	return nil, fmt.Errorf("project %v not found", projectName)
 }
 
-func (c *Client) get(method, url string) (*http.Response, error) {
+func (c *Client) get(url string) (*http.Response, error) {
 	req, err := http.NewRequest(
-		method,
+		"GET",
 		fmt.Sprintf("%s%s", c.baseURL, url),
 		nil,
 	)
@@ -116,8 +116,8 @@ func (c *Client) get(method, url string) (*http.Response, error) {
 	return res, nil
 }
 
-func (c *Client) getInterface(method, url string, response interface{}) error {
-	res, err := c.get(method, url)
+func (c *Client) getInterface(url string, response interface{}) error {
+	res, err := c.get(url)
 	if err != nil {
 		return err
 	}
@@ -131,8 +131,8 @@ func (c *Client) getInterface(method, url string, response interface{}) error {
 	return nil
 }
 
-func (c *Client) getContainer(method, url string) (*gabs.Container, error) {
-	res, err := c.get(method, url)
+func (c *Client) getContainer(url string) (*gabs.Container, error) {
+	res, err := c.get(url)
 	if err != nil {
 		return nil, err
 	}

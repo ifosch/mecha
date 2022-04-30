@@ -19,7 +19,7 @@ func (p *Project) GetSprints(state string) (*SprintList, error) {
 	}
 
 	var boards BoardList
-	err := p.c.getInterface("GET", fmt.Sprintf("/rest/agile/1.0/board?projectKeyOrId=%v", p.ID), &boards)
+	err := p.c.getInterface(fmt.Sprintf("/rest/agile/1.0/board?projectKeyOrId=%v", p.ID), &boards)
 	if err != nil {
 		return nil, err
 	}
@@ -29,7 +29,7 @@ func (p *Project) GetSprints(state string) (*SprintList, error) {
 		Values: []Sprint{},
 	}
 	for _, b := range boards.Values {
-		err = p.c.getInterface("GET", fmt.Sprintf("/rest/agile/1.0/board/%v/sprint?state=%v", b.ID, state), &sprints)
+		err = p.c.getInterface(fmt.Sprintf("/rest/agile/1.0/board/%v/sprint?state=%v", b.ID, state), &sprints)
 		if err != nil && err.Error() != "unknown error, status code: 400" {
 			return nil, err
 		}

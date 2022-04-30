@@ -54,7 +54,7 @@ func (s *Sprint) GetStats() (map[string]map[string]int, error) {
 
 // GetIssues returns all the issues found for the Sprint, or an error.
 func (s *Sprint) GetIssues() (*IssueList, error) {
-	container, err := s.c.getContainer("GET", fmt.Sprintf("/rest/agile/1.0/sprint/%v/issue", s.ID))
+	container, err := s.c.getContainer(fmt.Sprintf("/rest/agile/1.0/sprint/%v/issue", s.ID))
 	if err != nil {
 		return nil, err
 	}
