@@ -68,7 +68,7 @@ func (c *Client) FindProject(projectName string) (*Project, error) {
 	}
 
 	for _, p := range *pl {
-		if p.Name == projectName {
+		if p.Name == projectName || p.Key == projectName {
 			p.c = c
 			return &p, nil
 		}

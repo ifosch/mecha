@@ -8,6 +8,7 @@ import (
 type Project struct{
 	Name string `json:"name"`
 	ID string `json:"id"`
+	Key string `json:"key"`
 	c *Client
 }
 
