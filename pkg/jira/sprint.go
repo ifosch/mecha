@@ -3,6 +3,7 @@ package jira
 import (
 	"fmt"
 	"os"
+	"strconv"
 	"strings"
 	"time"
 )
@@ -17,6 +18,38 @@ type Sprint struct {
 	CompleteDate time.Time `json:"completeDate"`
 	BoardID int `json:"originBoardId"`
 	c *Client
+}
+
+// GetStats returns stats for this specific Sprint, or an error.
+func (s *Sprint) GetStats() (map[string]map[string]int, error) {
+	il, err := s.GetIssues()
+	if err != nil {
+		return nil, err
+	}
+
+	ss := map[string]map[string]int{}
+	for _, i := range il.Issues {
+		SP, err := strconv.Atoi(i.Fields.StoryPoints)
+		if err != nil {
+			SP = 0
+		}
+
+		if _, ok := ss[i.Fields.Status.Name]; ok {
+			ss[i.Fields.Status.Name]["Stories"] += 1
+			ss[i.Fields.Status.Name]["SP"] += SP
+		} else {
+			ss[i.Fields.Status.Name] = map[string]int{
+				"Stories": 1,
+				"SP": SP,
+				"Missing SP": 0,
+			}
+		}
+		if SP == 0 {
+			ss[i.Fields.Status.Name]["Missing SP"] += 1
+		}
+	}
+
+	return ss, nil
 }
 
 // GetIssues returns all the issues found for the Sprint, or an error.
