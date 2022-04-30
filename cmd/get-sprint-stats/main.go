@@ -11,6 +11,7 @@ import (
 
 func main() {
 	projectName := flag.String("project", "", "Project to show the sprints for")
+	sprintState := flag.String("state", "", "Sprint state filter. Can be combined in comma separated values. Valid values: active,future,closed")
 	flag.Parse()
 
 	c := jira.NewClient(os.Getenv("JIRA_URL"), os.Getenv("JIRA_USERNAME"), os.Getenv("JIRA_API_TOKEN"), nil)
@@ -20,7 +21,7 @@ func main() {
 		log.Fatalln(err)
 	}
 
-	sprints, err := project.GetSprints()
+	sprints, err := project.GetSprints(*sprintState)
 	if err != nil {
 		log.Fatalln(err)
 	}
