@@ -1,6 +1,7 @@
 package jira
 
 import (
+	"bytes"
 	"context"
 	"errors"
 	"fmt"
@@ -74,6 +75,44 @@ func (c *Client) FindProject(projectName string) (*Project, error) {
 		}
 	}
 	return nil, fmt.Errorf("project %v not found", projectName)
+}
+
+func (c *Client) post(url string, data []byte) (*http.Response, error) {
+	req, err := http.NewRequest(
+		"POST",
+		fmt.Sprintf("%s%s", c.baseURL, url),
+		bytes.NewBuffer(data),
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	req.SetBasicAuth(c.userName, c.apiKey)
+	req = req.WithContext(c.ctx)
+
+	req.Header.Set("Content-Type", "application/json; charset=utf-8")
+	req.Header.Set("Accept", "application/json; charset=utf-8")
+
+	res, err := c.HTTPClient.Do(req)
+	if err != nil {
+		return nil, err
+	}
+
+	if res.StatusCode < http.StatusOK ||
+	   res.StatusCode >= http.StatusBadRequest {
+		var errRes errorResponse
+		err = json.NewDecoder(res.Body).Decode(&errRes)
+		if err == nil {
+			if errRes.Message == "" {
+				return nil, fmt.Errorf(
+					"unknown error, status code: %d",
+					res.StatusCode,
+				)
+			}
+			return nil, errors.New(errRes.Message)
+		}
+	}
+	return res, nil
 }
 
 func (c *Client) get(url string) (*http.Response, error) {
