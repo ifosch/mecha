@@ -22,19 +22,21 @@ type Sprint struct {
 	c *Client
 }
 
-// Complete sets the sprint as complete, or returns an error.
-func (s *Sprint) Complete() error {
-	completeSprintInputData := &completeSprintInput{
-		State: "closed",
+// Start starts the sprint, or returns an error.
+func (s *Sprint) Start() error {
+	updateSprintInputData := &updateSprintInput{
+		State: "active",
+		StartDate: time.Now(),
+		EndDate: time.Now().Local().Add(time.Hour * 24 * 14),
 	}
-	completeSprintInputJSON, err := json.Marshal(completeSprintInputData)
+	updateSprintInputJSON, err := json.Marshal(updateSprintInputData)
 	if err != nil {
 		return err
 	}
 
 	_, err = s.c.post(
 		fmt.Sprintf("/rest/agile/1.0/sprint/%v", s.ID),
-		completeSprintInputJSON,
+		updateSprintInputJSON,
 	)
 	if err != nil {
 		return err
@@ -43,8 +45,33 @@ func (s *Sprint) Complete() error {
 	return nil
 }
 
-type completeSprintInput struct{
+// Complete sets the sprint as complete, or returns an error.
+func (s *Sprint) Complete() error {
+	updateSprintInputData := &updateSprintInput{
+		State: "closed",
+		StartDate: s.StartDate,
+		EndDate: s.EndDate,
+	}
+	updateSprintInputJSON, err := json.Marshal(updateSprintInputData)
+	if err != nil {
+		return err
+	}
+
+	_, err = s.c.post(
+		fmt.Sprintf("/rest/agile/1.0/sprint/%v", s.ID),
+		updateSprintInputJSON,
+	)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+type updateSprintInput struct{
 	State string `json:"state"`
+	StartDate time.Time `json:"startDate"`
+	EndDate time.Time `json:"endDate"`
 }
 
 // MoveIssuesToNextSprint moves all issues defined in `issues`
