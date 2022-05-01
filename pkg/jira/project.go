@@ -1,7 +1,10 @@
 package jira
 
 import (
+	"encoding/json"
 	"fmt"
+	"strconv"
+	"strings"
 )
 
 // Project represents a Jira Project.
@@ -10,6 +13,47 @@ type Project struct{
 	ID string `json:"id"`
 	Key string `json:"key"`
 	c *Client
+}
+
+// CreateSprint creates a new sprint in the first board and returns its name, or returns an error.
+func (p *Project) CreateSprint() (string, error) {
+	lastCreatedSprint, err := p.GetLastCreatedSprint()
+	if err != nil {
+		return "", err
+	}
+
+	nameWords := strings.Split(lastCreatedSprint.Name, " ")
+	sprintNumber, err := strconv.Atoi(nameWords[len(nameWords)-1])
+	if err != nil {
+		return "", err
+	}
+	sprintNumber += 1
+	nameWords[len(nameWords)-1] = fmt.Sprintf("%v", sprintNumber)
+	newName := strings.Join(nameWords, " ")
+
+	createSprintInputData := &createSprintInput{
+		Name: newName,
+		BoardID: lastCreatedSprint.BoardID,
+	}
+	createSprintInputJSON, err := json.Marshal(createSprintInputData)
+	if err != nil {
+		return "", err
+	}
+
+	_, err = p.c.post(
+		"/rest/agile/1.0/sprint",
+		createSprintInputJSON,
+	)
+	if err != nil {
+		return "", err
+	}
+
+	return newName, nil
+}
+
+type createSprintInput struct{
+	Name string `json:"name"`
+	BoardID int `json:"originBoardId"`
 }
 
 // GetSprints returns all the sprints found for the Project, or an error.
@@ -43,6 +87,15 @@ func (p *Project) GetSprints(state string) (*SprintList, error) {
 	}
 
 	return &finalSprints, nil
+}
+
+// GetLastCreatedSprint return last created Sprint, or an error.
+func (p *Project) GetLastCreatedSprint() (*Sprint, error) {
+	sprints, err := p.GetSprints("closed,active,future")
+	if err != nil {
+		return nil, err
+	}
+	return &sprints.Values[len(sprints.Values)-1], nil
 }
 
 // GetCurrentSprint return current active Sprint, or an error.
