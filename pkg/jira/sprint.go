@@ -22,6 +22,31 @@ type Sprint struct {
 	c *Client
 }
 
+// Complete sets the sprint as complete, or returns an error.
+func (s *Sprint) Complete() error {
+	completeSprintInputData := &completeSprintInput{
+		State: "closed",
+	}
+	completeSprintInputJSON, err := json.Marshal(completeSprintInputData)
+	if err != nil {
+		return err
+	}
+
+	_, err = s.c.post(
+		fmt.Sprintf("/rest/agile/1.0/sprint/%v", s.ID),
+		completeSprintInputJSON,
+	)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+type completeSprintInput struct{
+	State string `json:"state"`
+}
+
 // MoveIssuesToNextSprint moves all issues defined in `issues`
 // argument to next future sprint, or returns an error.
 func (s *Sprint) MoveIssuesToNextSprint(issues *IssueList) error {
