@@ -3,8 +3,6 @@ package jira
 import (
 	"encoding/json"
 	"fmt"
-	"strconv"
-	"strings"
 )
 
 // Project represents a Jira Project.
@@ -22,14 +20,10 @@ func (p *Project) CreateSprint() (string, error) {
 		return "", err
 	}
 
-	nameWords := strings.Split(lastCreatedSprint.Name, " ")
-	sprintNumber, err := strconv.Atoi(nameWords[len(nameWords)-1])
+	newName, err := lastCreatedSprint.NextSprintName()
 	if err != nil {
-		return "", err
+		return "", nil
 	}
-	sprintNumber += 1
-	nameWords[len(nameWords)-1] = fmt.Sprintf("%v", sprintNumber)
-	newName := strings.Join(nameWords, " ")
 
 	createSprintInputData := &createSprintInput{
 		Name: newName,

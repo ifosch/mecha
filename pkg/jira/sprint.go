@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"os"
+	"regexp"
 	"strconv"
 	"strings"
 	"time"
@@ -20,6 +21,35 @@ type Sprint struct {
 	BoardID int `json:"originBoardId"`
 	p *Project
 	c *Client
+}
+
+func getSep(input string, seps map[string]string) (sep string) {
+	for r, sep := range seps {
+		match, _ := regexp.MatchString(r, input)
+		if match {
+			return sep
+		}
+	}
+	return ""
+}
+
+// NextSprintName returns the next sprint name according to
+// calculation rules.
+func (s *Sprint) NextSprintName() (string, error) {
+	sprintNameSeps := map[string]string{
+		"[A-Z0-9]+ Sprint [0-9]+$": " ",
+		"[A-Z0-9]+ Sprint [0-9]{4}-[0-9]+$": "-",
+	}
+	sep := getSep(s.Name, sprintNameSeps)
+
+	nameWords := strings.Split(s.Name, sep)
+	sprintNumber, err := strconv.Atoi(nameWords[len(nameWords)-1])
+	if err != nil {
+		return "", err
+	}
+	sprintNumber += 1
+	nameWords[len(nameWords)-1] = fmt.Sprintf("%v", sprintNumber)
+	return strings.Join(nameWords, sep), nil
 }
 
 // Start starts the sprint, or returns an error.
