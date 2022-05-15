@@ -1,6 +1,7 @@
 package command
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"log"
@@ -21,7 +22,7 @@ Options:
 // NewMoveCommand returns the command for the Move operation.
 func NewMoveCommand() *Command {
 	cmd := &Command{
-		flags: flag.NewFlagSet("move", flag.ExitOnError),
+		flags:   flag.NewFlagSet("move", flag.ExitOnError),
 		Execute: moveFunc,
 	}
 
@@ -39,7 +40,7 @@ var (
 )
 
 var moveFunc = func(cmd *Command, args []string) {
-	c := jira.NewClient(os.Getenv("JIRA_URL"), os.Getenv("JIRA_USERNAME"), os.Getenv("JIRA_API_TOKEN"), nil)
+	c := jira.NewClient(context.TODO(), os.Getenv("JIRA_URL"), os.Getenv("JIRA_USERNAME"), os.Getenv("JIRA_API_TOKEN"))
 
 	project, err := c.FindProject(projectName)
 	if err != nil {

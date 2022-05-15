@@ -1,6 +1,7 @@
 package command
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"log"
@@ -21,7 +22,7 @@ Options:
 // NewGetCommand returns a command for the Get operation.
 func NewGetCommand() *Command {
 	cmd := &Command{
-		flags: flag.NewFlagSet("get", flag.ExitOnError),
+		flags:   flag.NewFlagSet("get", flag.ExitOnError),
 		Execute: getFunc,
 	}
 
@@ -40,7 +41,7 @@ var (
 )
 
 var getFunc = func(cmd *Command, args []string) {
-	c := jira.NewClient(os.Getenv("JIRA_URL"), os.Getenv("JIRA_USERNAME"), os.Getenv("JIRA_API_TOKEN"), nil)
+	c := jira.NewClient(context.TODO(), os.Getenv("JIRA_URL"), os.Getenv("JIRA_USERNAME"), os.Getenv("JIRA_API_TOKEN"))
 
 	project, err := c.FindProject(projectName)
 	if err != nil {

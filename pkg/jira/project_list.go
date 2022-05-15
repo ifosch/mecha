@@ -4,8 +4,10 @@ import (
 	"fmt"
 )
 
+// ProjectList is a list of Projects.
 type ProjectList []Project
 
+// String is the Stringer implementation.
 func (pl ProjectList) String() string {
 	output := ""
 

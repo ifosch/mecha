@@ -5,7 +5,7 @@ import (
 )
 
 // SprintList represents a list of Sprints, as returned by the Jira REST API.
-type SprintList struct{
+type SprintList struct {
 	Values []Sprint `json:"values"`
 }
 

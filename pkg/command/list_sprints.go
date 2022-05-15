@@ -1,6 +1,7 @@
 package command
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"log"
@@ -23,11 +24,11 @@ Options:
 // NewListSprintsCommand returns the command for the ListSprints operation.
 func NewListSprintsCommand() *Command {
 	cmd := &Command{
-		flags: flag.NewFlagSet("list-sprints", flag.ExitOnError),
+		flags:   flag.NewFlagSet("list-sprints", flag.ExitOnError),
 		Execute: listSprintsFunc,
 	}
 
- 	cmd.flags.StringVar(&projectName, "project", "", "")
+	cmd.flags.StringVar(&projectName, "project", "", "")
 	cmd.flags.StringVar(&sprintState, "state", "", "")
 	cmd.flags.BoolVar(&last, "last", false, "")
 	cmd.flags.BoolVar(&next, "next", false, "")
@@ -44,7 +45,7 @@ var (
 )
 
 var listSprintsFunc = func(cmd *Command, args []string) {
-	c := jira.NewClient(os.Getenv("JIRA_URL"), os.Getenv("JIRA_USERNAME"), os.Getenv("JIRA_API_TOKEN"), nil)
+	c := jira.NewClient(context.TODO(), os.Getenv("JIRA_URL"), os.Getenv("JIRA_USERNAME"), os.Getenv("JIRA_API_TOKEN"))
 
 	project, err := c.FindProject(projectName)
 	if err != nil {
@@ -64,8 +65,8 @@ var listSprintsFunc = func(cmd *Command, args []string) {
 		}
 		sprints = &jira.SprintList{
 			Values: []jira.Sprint{
-				jira.Sprint{
-					Name: nextSprintName,
+				{
+					Name:  nextSprintName,
 					State: "-",
 				},
 			},

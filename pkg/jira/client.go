@@ -3,9 +3,9 @@ package jira
 import (
 	"bytes"
 	"context"
+	"encoding/json"
 	"errors"
 	"fmt"
-	"encoding/json"
 	"net/http"
 	"time"
 
@@ -15,38 +15,38 @@ import (
 // Client represents a basic client object to access the
 // API.
 type Client struct {
-	baseURL string
-	userName string
-	apiKey string
+	baseURL    string
+	userName   string
+	apiKey     string
 	HTTPClient *http.Client
-	ctx context.Context
+	ctx        context.Context
 }
 
 type errorResponse struct {
-    Code    int    `json:"code"`
-    Message string `json:"message"`
+	Code    int    `json:"code"`
+	Message string `json:"message"`
 }
 
 // NewClient constructs a new Client object with the API token defined
 // in `apiKey` argument.
-func NewClient(baseURL, userName, apiKey string, ctx context.Context) *Client {
+func NewClient(ctx context.Context, baseURL, userName, apiKey string) *Client {
 	if ctx == nil {
 		ctx = context.Background()
 	}
 	return &Client{
-		baseURL: baseURL,
+		baseURL:  baseURL,
 		userName: userName,
-		apiKey: apiKey,
+		apiKey:   apiKey,
 		HTTPClient: &http.Client{
 			Timeout: time.Minute,
 		},
-		ctx: ctx, 
+		ctx: ctx,
 	}
 }
 
 // GetProjects returns a ProjectList with all the projects found, or
 // an error.
-func (c *Client) GetProjects()  (pl *ProjectList, err error) {
+func (c *Client) GetProjects() (pl *ProjectList, err error) {
 	pl = &ProjectList{}
 	err = c.getInterface("/rest/api/2/project", pl)
 	if err != nil {
@@ -99,7 +99,7 @@ func (c *Client) post(url string, data []byte) (*http.Response, error) {
 	}
 
 	if res.StatusCode < http.StatusOK ||
-	   res.StatusCode >= http.StatusBadRequest {
+		res.StatusCode >= http.StatusBadRequest {
 		var errRes errorResponse
 		err = json.NewDecoder(res.Body).Decode(&errRes)
 		if err == nil {
@@ -125,7 +125,7 @@ func (c *Client) get(url string) (*http.Response, error) {
 		return nil, err
 	}
 
-	req.SetBasicAuth(c.userName,c.apiKey)
+	req.SetBasicAuth(c.userName, c.apiKey)
 	req = req.WithContext(c.ctx)
 
 	req.Header.Set("Content-Type", "application/json; charset=utf-8")
@@ -137,7 +137,7 @@ func (c *Client) get(url string) (*http.Response, error) {
 	}
 
 	if res.StatusCode < http.StatusOK ||
-	   res.StatusCode >= http.StatusBadRequest {
+		res.StatusCode >= http.StatusBadRequest {
 		var errRes errorResponse
 		err = json.NewDecoder(res.Body).Decode(&errRes)
 		if err == nil {

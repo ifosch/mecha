@@ -10,7 +10,7 @@ type IssueList struct {
 	Issues []*Issue `json:"issues"`
 }
 
-// FilterStates returns a filtered `IssueList` with the issues with
+// FilterStatus returns a filtered `IssueList` with the issues with
 // states specified in the `states` argument (allows comma separated
 // values), or an error.
 func (il *IssueList) FilterStatus(status string) (*IssueList, error) {

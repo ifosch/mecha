@@ -8,7 +8,7 @@ import (
 
 // Command represents a command for mecha.
 type Command struct {
-	flags *flag.FlagSet
+	flags   *flag.FlagSet
 	Execute func(cmd *Command, args []string)
 }
 

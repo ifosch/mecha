@@ -1,6 +1,7 @@
 package command
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"log"
@@ -21,11 +22,11 @@ Options:
 // NewListIssuesCommand returns the command for the ListIssues operation.
 func NewListIssuesCommand() *Command {
 	cmd := &Command{
-		flags: flag.NewFlagSet("list-issues", flag.ExitOnError),
+		flags:   flag.NewFlagSet("list-issues", flag.ExitOnError),
 		Execute: listIssuesFunc,
 	}
 
- 	cmd.flags.StringVar(&projectName, "project", "", "")
+	cmd.flags.StringVar(&projectName, "project", "", "")
 	cmd.flags.StringVar(&sprintState, "state", "", "")
 	cmd.flags.Usage = func() {
 		fmt.Fprintln(os.Stderr, listIssuesUsage)
@@ -35,7 +36,7 @@ func NewListIssuesCommand() *Command {
 }
 
 var listIssuesFunc = func(cmd *Command, args []string) {
-	c := jira.NewClient(os.Getenv("JIRA_URL"), os.Getenv("JIRA_USERNAME"), os.Getenv("JIRA_API_TOKEN"), nil)
+	c := jira.NewClient(context.TODO(), os.Getenv("JIRA_URL"), os.Getenv("JIRA_USERNAME"), os.Getenv("JIRA_API_TOKEN"))
 
 	project, err := c.FindProject(projectName)
 	if err != nil {

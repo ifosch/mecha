@@ -6,11 +6,11 @@ import (
 )
 
 // Project represents a Jira Project.
-type Project struct{
+type Project struct {
 	Name string `json:"name"`
-	ID string `json:"id"`
-	Key string `json:"key"`
-	c *Client
+	ID   string `json:"id"`
+	Key  string `json:"key"`
+	c    *Client
 }
 
 // CreateSprint creates a new sprint in the first board and returns its name, or returns an error.
@@ -26,7 +26,7 @@ func (p *Project) CreateSprint() (string, error) {
 	}
 
 	createSprintInputData := &createSprintInput{
-		Name: newName,
+		Name:    newName,
 		BoardID: lastCreatedSprint.BoardID,
 	}
 	createSprintInputJSON, err := json.Marshal(createSprintInputData)
@@ -45,15 +45,15 @@ func (p *Project) CreateSprint() (string, error) {
 	return newName, nil
 }
 
-type createSprintInput struct{
-	Name string `json:"name"`
-	BoardID int `json:"originBoardId"`
+type createSprintInput struct {
+	Name    string `json:"name"`
+	BoardID int    `json:"originBoardId"`
 }
 
 // GetSprints returns all the sprints found for the Project, or an error.
 func (p *Project) GetSprints(state string) (*SprintList, error) {
 	if state == "" {
-		state="active,future"
+		state = "active,future"
 	}
 
 	var boards BoardList

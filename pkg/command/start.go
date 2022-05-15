@@ -1,6 +1,7 @@
 package command
 
 import (
+	"context"
 	"flag"
 	"fmt"
 	"log"
@@ -20,7 +21,7 @@ Options:
 // NewStartCommand returns a new command for a Start operation.
 func NewStartCommand() *Command {
 	cmd := &Command{
-		flags: flag.NewFlagSet("start", flag.ExitOnError),
+		flags:   flag.NewFlagSet("start", flag.ExitOnError),
 		Execute: startFunc,
 	}
 
@@ -33,7 +34,7 @@ func NewStartCommand() *Command {
 }
 
 var startFunc = func(cmd *Command, args []string) {
-	c := jira.NewClient(os.Getenv("JIRA_URL"), os.Getenv("JIRA_USERNAME"), os.Getenv("JIRA_API_TOKEN"), nil)
+	c := jira.NewClient(context.TODO(), os.Getenv("JIRA_URL"), os.Getenv("JIRA_USERNAME"), os.Getenv("JIRA_API_TOKEN"))
 
 	project, err := c.FindProject(projectName)
 	if err != nil {

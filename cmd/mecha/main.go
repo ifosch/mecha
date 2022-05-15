@@ -33,7 +33,7 @@ func usageAndExit(msg string) {
 
 func main() {
 	flag.Usage = func() {
-		fmt.Fprint(os.Stderr, fmt.Sprintf(usage))
+		fmt.Fprint(os.Stderr, usage)
 	}
 
 	var cmd *command.Command

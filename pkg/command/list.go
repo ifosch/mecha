@@ -19,7 +19,7 @@ Commands:
 // NewListCommand returns the command for all List operations.
 func NewListCommand() *Command {
 	cmd := &Command{
-		flags: flag.NewFlagSet("list", flag.ExitOnError),
+		flags:   flag.NewFlagSet("list", flag.ExitOnError),
 		Execute: listFunc,
 	}
 

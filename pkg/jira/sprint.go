@@ -12,15 +12,15 @@ import (
 
 // Sprint represents a Jira Sprint for a Project.
 type Sprint struct {
-	ID int `json:"id"`
-	State string `json:"state"`
-	Name string `json:"name"`
-	StartDate time.Time `json:"startDate"`
-	EndDate time.Time `json:"endDate"`
+	ID           int       `json:"id"`
+	State        string    `json:"state"`
+	Name         string    `json:"name"`
+	StartDate    time.Time `json:"startDate"`
+	EndDate      time.Time `json:"endDate"`
 	CompleteDate time.Time `json:"completeDate"`
-	BoardID int `json:"originBoardId"`
-	p *Project
-	c *Client
+	BoardID      int       `json:"originBoardId"`
+	p            *Project
+	c            *Client
 }
 
 func getSep(input string, seps map[string]string) (sep string) {
@@ -37,7 +37,7 @@ func getSep(input string, seps map[string]string) (sep string) {
 // calculation rules.
 func (s *Sprint) NextSprintName() (string, error) {
 	sprintNameSeps := map[string]string{
-		"[A-Z0-9]+ Sprint [0-9]+$": " ",
+		"[A-Z0-9]+ Sprint [0-9]+$":          " ",
 		"[A-Z0-9]+ Sprint [0-9]{4}-[0-9]+$": "-",
 	}
 	sep := getSep(s.Name, sprintNameSeps)
@@ -47,7 +47,7 @@ func (s *Sprint) NextSprintName() (string, error) {
 	if err != nil {
 		return "", err
 	}
-	sprintNumber += 1
+	sprintNumber++
 	nameWords[len(nameWords)-1] = fmt.Sprintf("%v", sprintNumber)
 	return strings.Join(nameWords, sep), nil
 }
@@ -55,9 +55,9 @@ func (s *Sprint) NextSprintName() (string, error) {
 // Start starts the sprint, or returns an error.
 func (s *Sprint) Start() error {
 	updateSprintInputData := &updateSprintInput{
-		State: "active",
+		State:     "active",
 		StartDate: time.Now(),
-		EndDate: time.Now().Local().Add(time.Hour * 24 * 14),
+		EndDate:   time.Now().Local().Add(time.Hour * 24 * 14),
 	}
 	updateSprintInputJSON, err := json.Marshal(updateSprintInputData)
 	if err != nil {
@@ -78,9 +78,9 @@ func (s *Sprint) Start() error {
 // Complete sets the sprint as complete, or returns an error.
 func (s *Sprint) Complete() error {
 	updateSprintInputData := &updateSprintInput{
-		State: "closed",
+		State:     "closed",
 		StartDate: s.StartDate,
-		EndDate: s.EndDate,
+		EndDate:   s.EndDate,
 	}
 	updateSprintInputJSON, err := json.Marshal(updateSprintInputData)
 	if err != nil {
@@ -98,10 +98,10 @@ func (s *Sprint) Complete() error {
 	return nil
 }
 
-type updateSprintInput struct{
-	State string `json:"state"`
+type updateSprintInput struct {
+	State     string    `json:"state"`
 	StartDate time.Time `json:"startDate"`
-	EndDate time.Time `json:"endDate"`
+	EndDate   time.Time `json:"endDate"`
 }
 
 // MoveIssuesToNextSprint moves all issues defined in `issues`
@@ -130,7 +130,7 @@ func (s *Sprint) MoveIssuesToNextSprint(issues *IssueList) error {
 	return err
 }
 
-type moveIssuesInput struct{
+type moveIssuesInput struct {
 	Issues []string `json:"issues"`
 }
 
@@ -165,17 +165,17 @@ func (s *Sprint) GetStats() (map[string]map[string]int, error) {
 		}
 
 		if _, ok := ss[i.Fields.Status.Name]; ok {
-			ss[i.Fields.Status.Name]["Stories"] += 1
+			ss[i.Fields.Status.Name]["Stories"]++
 			ss[i.Fields.Status.Name]["SP"] += SP
 		} else {
 			ss[i.Fields.Status.Name] = map[string]int{
-				"Stories": 1,
-				"SP": SP,
+				"Stories":    1,
+				"SP":         SP,
 				"Missing SP": 0,
 			}
 		}
 		if SP == 0 {
-			ss[i.Fields.Status.Name]["Missing SP"] += 1
+			ss[i.Fields.Status.Name]["Missing SP"]++
 		}
 	}
 
@@ -194,19 +194,19 @@ func (s *Sprint) GetIssues() (*IssueList, error) {
 		path := fmt.Sprintf("fields.%s", os.Getenv("JIRA_SP_FIELD"))
 		SP := issue.Path(path)
 		i := Issue{
-			Key: strings.ReplaceAll(fmt.Sprintf("%s", issue.Path("key")), "\"", ""),
-			Fields: struct{
-				Status struct{
+			Key: strings.ReplaceAll(issue.Path("key").String(), "\"", ""),
+			Fields: struct {
+				Status struct {
 					Name string `json:"name"`
 				} `json:"status"`
 				StoryPoints string
 			}{
-				Status: struct{
+				Status: struct {
 					Name string `json:"name"`
 				}{
-					Name: strings.ReplaceAll(fmt.Sprintf("%s", issue.Path("fields.status.name")), "\"", ""),
+					Name: strings.ReplaceAll(issue.Path("fields.status.name").String(), "\"", ""),
 				},
-				StoryPoints: fmt.Sprintf("%s", SP),
+				StoryPoints: SP.String(),
 			},
 		}
 		il.Issues = append(il.Issues, &i)
