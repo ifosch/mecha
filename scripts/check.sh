@@ -2,6 +2,11 @@
 
 set -eu
 
+tests_check() {
+    echo "*** Run unit tests"
+    go test -v ./... -race -covermode=atomic
+}
+
 complexity_check() {
     echo "*** Complexity check"
     go install github.com/fzipp/gocyclo/cmd/gocyclo@latest
