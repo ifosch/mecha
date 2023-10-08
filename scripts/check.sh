@@ -5,7 +5,7 @@ set -eu
 complexity_check() {
     echo "*** Complexity check"
     go install github.com/fzipp/gocyclo/cmd/gocyclo@latest
-    gocyclo -avg -total -over 15 .
+    gocyclo -avg -over 15 .
 }
 
 format_check() {
