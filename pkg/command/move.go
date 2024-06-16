@@ -7,7 +7,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/ifosch/jira/pkg/jira"
+	"github.com/ifosch/mecha/pkg/jira"
 )
 
 var moveUsage = `Moves issues from the currently active sprint to the next one for the specified project.

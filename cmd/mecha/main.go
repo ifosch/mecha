@@ -5,7 +5,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/ifosch/jira/pkg/command"
+	"github.com/ifosch/mecha/pkg/command"
 )
 
 var usage = `Usage: mecha command [options]
