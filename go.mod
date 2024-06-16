@@ -1,4 +1,4 @@
-module github.com/ifosch/jira
+module github.com/ifosch/mecha
 
 go 1.22
 

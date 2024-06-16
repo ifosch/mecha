@@ -7,7 +7,7 @@ import (
 	"log"
 	"os"
 
-	"github.com/ifosch/jira/pkg/jira"
+	"github.com/ifosch/mecha/pkg/jira"
 )
 
 var getUsage = `Gets stats for active and future sprints in specified project.
