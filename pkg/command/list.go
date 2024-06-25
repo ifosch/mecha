@@ -6,7 +6,7 @@ import (
 	"os"
 )
 
-var listUsage = `Lists projects, sprints, and issues.
+var listUsage = `Lists projects, sprints, filters, and issues.
 
 Usage: mecha list object [options]
 
@@ -14,6 +14,7 @@ Commands:
   projects Lists all projects in the current Jira server
   sprints  Lists sprints for the specified project
   issues   Lists issues in sprints for the specified project
+  filters  Lists filters for user
 `
 
 // NewListCommand returns the command for all List operations.
@@ -42,6 +43,8 @@ var listFunc = func(cmd *Command, args []string) {
 		cmd = NewListSprintsCommand()
 	case "issues":
 		cmd = NewListIssuesCommand()
+	case "filters":
+		cmd = NewListFiltersCommand()
 	default:
 		cmd.usageAndExit(fmt.Sprintf("mecha: '%s' is not a mecha list comand.\n", args[1]))
 	}

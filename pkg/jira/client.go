@@ -44,6 +44,18 @@ func NewClient(ctx context.Context, baseURL, userName, apiKey string) *Client {
 	}
 }
 
+// GetFilters returns a FilterList with all the filters found, or
+// an error.
+func (c *Client) GetFilters() (fl *FilterList, err error) {
+	fl = &FilterList{}
+	err = c.getInterface("/rest/api/3/filter/my", fl)
+	if err != nil {
+		return nil, err
+	}
+
+	return
+}
+
 // GetProjects returns a ProjectList with all the projects found, or
 // an error.
 func (c *Client) GetProjects() (pl *ProjectList, err error) {

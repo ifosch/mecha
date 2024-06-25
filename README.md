@@ -96,6 +96,11 @@ Lists projects.
 Usage: mecha list projects
 ```
 
+### List user's filters
+```console
+mecha list filters
+```
+
 ### Get sprint stats
 ```console
 mecha get --project TEST

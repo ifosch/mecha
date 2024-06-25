@@ -13,7 +13,7 @@ var usage = `Usage: mecha command [options]
 A Jira CLI focused in project management tasks.
 
 Commands:
-  list     Lists projects, sprints, and issues
+  list     Lists projects, sprints, filters, and issues
   add      Adds a new sprint to specified project
   get      Gets stats for active and future sprints in specified project
   move     Moves all issues in currently active sprint to next one for the specified project
