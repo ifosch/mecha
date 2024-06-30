@@ -68,6 +68,17 @@ func (c *Client) GetProjects() (pl *ProjectList, err error) {
 	return
 }
 
+// GetFilter returns a filter with the ID argument, or an error.
+func (c *Client) GetFilter(filterID int) (f *Filter, err error) {
+	f = &Filter{}
+	err = c.getInterface(fmt.Sprintf("/rest/api/3/filter/%d", filterID), f)
+	if err != nil {
+		return nil, err
+	}
+
+	return
+}
+
 // FindProject returns a project with a name matching `projectName`
 // argument, or an error.
 func (c *Client) FindProject(projectName string) (*Project, error) {

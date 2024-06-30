@@ -103,7 +103,12 @@ mecha list filters
 
 ### Get sprint stats
 ```console
-mecha get --project TEST
+mecha get stats --project TEST
+```
+
+### Get filter
+```console
+mecha get filter FILTER_ID
 ```
 
 ### Move all non closed stories in current active sprint to the next sprint

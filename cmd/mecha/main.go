@@ -15,7 +15,7 @@ A Jira CLI focused in project management tasks.
 Commands:
   list     Lists projects, sprints, filters, and issues
   add      Adds a new sprint to specified project
-  get      Gets stats for active and future sprints in specified project
+  get      Gets stats or filters
   move     Moves all issues in currently active sprint to next one for the specified project
   start    Starts the next sprint for the specified project
   complete Completes the active sprint in the specified project
