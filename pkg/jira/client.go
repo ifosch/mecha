@@ -56,11 +56,12 @@ func (c *Client) GetFilters() (fl *FilterList, err error) {
 	return
 }
 
-// GetProjects returns a ProjectList with all the projects found, or
-// an error.
-func (c *Client) GetProjects() (pl *ProjectList, err error) {
-	pl = &ProjectList{}
-	err = c.getInterface("/rest/api/2/project", pl)
+// GetFilter returns a filter with the ID argument, or an error.
+func (c *Client) GetFilter(filterID int) (f *Filter, err error) {
+	f = &Filter{
+		c: c,
+	}
+	err = c.getInterface(fmt.Sprintf("/rest/api/3/filter/%d", filterID), f)
 	if err != nil {
 		return nil, err
 	}
@@ -68,10 +69,23 @@ func (c *Client) GetProjects() (pl *ProjectList, err error) {
 	return
 }
 
-// GetFilter returns a filter with the ID argument, or an error.
-func (c *Client) GetFilter(filterID int) (f *Filter, err error) {
-	f = &Filter{}
-	err = c.getInterface(fmt.Sprintf("/rest/api/3/filter/%d", filterID), f)
+// GetFilterColumns returns a ColumnList with all the columns for the
+// specified filter, or an error.
+func (c *Client) GetFilterColumns(filterID string) (cl *ColumnList, err error) {
+	cl = &ColumnList{}
+	err = c.getInterface(fmt.Sprintf("/rest/api/3/filter/%s/columns", filterID), cl)
+	if err != nil {
+		return nil, err
+	}
+
+	return
+}
+
+// GetProjects returns a ProjectList with all the projects found, or
+// an error.
+func (c *Client) GetProjects() (pl *ProjectList, err error) {
+	pl = &ProjectList{}
+	err = c.getInterface("/rest/api/2/project", pl)
 	if err != nil {
 		return nil, err
 	}

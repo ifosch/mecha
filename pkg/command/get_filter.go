@@ -45,6 +45,12 @@ var getFilterFunc = func(cmd *Command, args []string) {
 	}
 
 	fmt.Println(f)
+	cl, err := f.GetColumns()
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+	fmt.Println(cl.GetLabels())
 
 	os.Exit(0)
 }
