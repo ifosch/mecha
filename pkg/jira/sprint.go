@@ -195,12 +195,7 @@ func (s *Sprint) GetIssues() (*IssueList, error) {
 		SP := issue.Path(path)
 		i := Issue{
 			Key: strings.ReplaceAll(issue.Path("key").String(), "\"", ""),
-			Fields: struct {
-				Status struct {
-					Name string `json:"name"`
-				} `json:"status"`
-				StoryPoints string
-			}{
+			Fields: IssueFields{
 				Status: struct {
 					Name string `json:"name"`
 				}{

@@ -32,7 +32,7 @@ func (il *IssueList) String() string {
 	output := ""
 
 	for _, i := range il.Issues {
-		output += fmt.Sprintf("  - %v %v (%v)\n", i.Key, i.Fields.Status.Name, i.Fields.StoryPoints)
+		output += fmt.Sprintf("  - %v\n", i.Key)
 	}
 
 	return output
