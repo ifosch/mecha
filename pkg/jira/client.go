@@ -81,8 +81,38 @@ func (c *Client) GetFilterColumns(filterID string) (cl *ColumnList, err error) {
 	return
 }
 
-// GetProjects returns a ProjectList with all the projects found, or
-// an error.
+type searchParams struct {
+	JQL        string   `json:"jql"`
+	StartAt    int      `json:"startAt"`
+	MaxResults int      `json:"maxResults"`
+	Fields     []string `json:"fields"`
+}
+
+// Search returns an IssueList with all the issues found for the
+// specified JQL, or an error.
+func (c *Client) Search(jql string, cl *ColumnList) (*IssueList, error) {
+	il := &IssueList{}
+	sp := searchParams{
+		JQL:        jql,
+		StartAt:    0,
+		MaxResults: 1000,
+		Fields:     cl.GetLabelNames(),
+	}
+
+	err := c.postInterface(
+		"/rest/api/3/search",
+		sp,
+		il,
+	)
+	if err != nil {
+		return nil, err
+	}
+
+	return il, err
+}
+
+// GetProjects returns a ProjectList with
+// all the projects found, or an error.
 func (c *Client) GetProjects() (pl *ProjectList, err error) {
 	pl = &ProjectList{}
 	err = c.getInterface("/rest/api/2/project", pl)
@@ -150,6 +180,28 @@ func (c *Client) post(url string, data []byte) (*http.Response, error) {
 		}
 	}
 	return res, nil
+}
+
+func (c *Client) postInterface(url string, rawData interface{}, response interface{}) error {
+	var data bytes.Buffer
+	enc := json.NewEncoder(&data)
+	err := enc.Encode(rawData)
+	if err != nil {
+		return err
+	}
+
+	res, err := c.post(url, data.Bytes())
+	if err != nil {
+		return err
+	}
+	defer res.Body.Close()
+
+	err = json.NewDecoder(res.Body).Decode(response)
+	if err != nil {
+		return err
+	}
+
+	return nil
 }
 
 func (c *Client) get(url string) (*http.Response, error) {

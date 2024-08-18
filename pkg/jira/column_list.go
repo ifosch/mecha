@@ -7,6 +7,18 @@ import (
 // ColumnList is a list of Columns.
 type ColumnList []Column
 
+// GetLabelNames returns a list of all the label names for the
+// columns.
+func (cl ColumnList) GetLabelNames() []string {
+	labelNames := []string{}
+
+	for _, c := range cl {
+		labelNames = append(labelNames, c.Value)
+	}
+
+	return labelNames
+}
+
 // GetLabels returns a list of all the labels for the columns.
 func (cl ColumnList) GetLabels() []string {
 	labels := []string{}

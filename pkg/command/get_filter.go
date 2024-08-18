@@ -52,5 +52,14 @@ var getFilterFunc = func(cmd *Command, args []string) {
 	}
 	fmt.Println(cl.GetLabels())
 
+	il, err := f.GetIssues()
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+	for _, i := range il.Issues {
+		fmt.Printf("%v\t%v\t%v\t%v\t%v\t%v\t%v\t%v\n", i.Fields.Summary, i.Fields.Project.Name, i.Fields.Created, i.Fields.IssueType, i.Fields.Status, i.Fields.Updated, i.Fields.StoryPoints, i.Fields.Labels)
+	}
+
 	os.Exit(0)
 }
